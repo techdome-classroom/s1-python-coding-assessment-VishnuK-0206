@@ -21,7 +21,6 @@ class Solution:
         for r in range(rows):
             for c in range(cols):
                 if grid[r][c] == 'L' and not visited[r][c]:
-                    
                     dfs(r, c)
                     island_count += 1
 
