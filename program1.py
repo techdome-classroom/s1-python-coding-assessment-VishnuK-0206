@@ -2,42 +2,25 @@ class Solution:
    
     def getTotalIsles(self, grid: list[list[str]]) -> int:
     #    write your code here
-        if not grid:
-            return 0
-            
-        rows = len(grid)
-        cols = len(grid[0])
-        islands = 0
+        m, n = len(message), len(pattern)
+        dp = [[False] * (n + 1) for _ in range(m + 1)]
         
-        def dfs(i: int, j: int) -> None:
-            # Check if current position is out of bounds or not land
-            if (i < 0 or i >= rows or 
-                j < 0 or j >= cols or 
-                grid[i][j] != '1'):
-                return
-            
-            # Mark current land as visited by changing it to '2'
-            grid[i][j] = '2'
-            
-            # Check all adjacent cells
-            dfs(i+1, j)  # down
-            dfs(i-1, j)  # up
-            dfs(i, j+1)  # right
-            dfs(i, j-1)  # left
+        # Empty pattern matches empty string
+        dp[0][0] = True
         
-        # Iterate through each cell in the grid
-        for i in range(rows):
-            for j in range(cols):
-                # If we find a new unvisited island (1)
-                if grid[i][j] == '1':
-                    islands += 1
-                    # Use DFS to mark all connected land
-                    dfs(i, j)
+        # Handle patterns starting with *
+        for j in range(1, n + 1):
+            if pattern[j-1] == '*':
+                dp[0][j] = dp[0][j-1]
         
-        # Restore grid to original state (optional)
-        for i in range(rows):
-            for j in range(cols):
-                if grid[i][j] == '2':
-                    grid[i][j] = '1'
-                    
-        return islands
+        # Fill the DP table
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if pattern[j-1] == '*':
+                    # * can match current char and continue, or skip current char
+                    dp[i][j] = dp[i][j-1] or dp[i-1][j]
+                elif pattern[j-1] == '?' or pattern[j-1] == message[i-1]:
+                    # ? matches any single char, or chars match exactly
+                    dp[i][j] = dp[i-1][j-1]
+                
+        return dp[m][n]
